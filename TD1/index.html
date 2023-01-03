@@ -7,6 +7,17 @@
     <title>Geocalisation</title>
 </head>
 <body>
+
+    <div id="Latitude"></div>
+    <div id="Longitude"></div>
+    <div id="Altitude"></div>
+    <div id="Vitesse"></div>
+    <div id="Précision"></div>
+    <div id ="Date"></div>
+    <div id="Alpha"></div>
+    <div id="Beta"></div>
+    <div id = "Gamma"></div>
+
 <script>
     var options = {
         enableHighAccuracy: true,
@@ -21,14 +32,47 @@
         console.log(`Latitude : ${crd.latitude}`);
         console.log(`Longitude : ${crd.longitude}`);
         console.log(`Altitude : ${crd.altitude}`)
-        console.log(`La précision est de ${crd.accuracy} mètres.`);
+        console.log(`Vitesse : ${crd.speed}`)
+        console.log(`La précision est de ${crd.accuracy} m.`);
+        showDate()
+
+        document.getElementById('Latitude').innerHTML = `Latitude : ${crd.latitude}`;
+        document.getElementById('Longitude').innerHTML = `Longitude : ${crd.longitude}`;
+        document.getElementById('Altitude').innerHTML = `Altitude : ${crd.altitude}`;
+        document.getElementById('Vitesse').innerHTML = `vitesse : ${crd.speed}`;
+        document.getElementById('Précision').innerHTML = `La précision est de ${crd.accuracy} m`;
+   
+        
       }
-      
+
+      function showDate() {
+        var today = new Date();
+        var date = "Date: " + today.toDateString();
+        console.log(date)
+        document.getElementById('Date').innerHTML = `Date : ${today.toDateString()}`;
+      }
       function error(err) {
         console.warn(`ERREUR (${err.code}): ${err.message}`);
       }
+
+      if (window.DeviceOrientationEvent) {
+        window.addEventListener('deviceorientation', function(event) {
+          console.log("Alpha: " + event.alpha);
+          console.log("Beta: " + event.beta);
+          console.log("Gamma: " + event.gamma);
+        });
+      } else {
+        console.log("Device orientation is not supported.");
+
+        document.getElementById('Alpha').innerHTML = `Alpha : ${event.alpha}`;
+        document.getElementById('Beta').innerHTML = `Beta : ${event.beta}`;
+        document.getElementById('Gamma').innerHTML = `Gamma : ${event.gamma}`;
+
+      };
+
       
-      navigator.geolocation.getCurrentPosition(success, error, options);
+      
+      navigator.geolocation.watchPosition(success, error, options);
 </script>    
 </body>
 </html>

@@ -14,9 +14,23 @@
     <div id="Vitesse"></div>
     <div id="Précision"></div>
     <div id ="Date"></div>
-    <div id="Alpha"></div>
-    <div id="Beta"></div>
-    <div id = "Gamma"></div>
+    <div id="alpha"></div>
+    <div id="beta"></div>
+    <div id ="gamma"></div>
+    <div id = "AccelerationX"></div>
+    <div id ="AccelerationY"></div>
+    <div id="AccelerationZ"></div>
+    <div id="RotationAlpha"></div>
+    <div id ="RotationBeta:"></div>
+    <div id = "RotationGamma"></div>
+
+    <div id="touchpositionx"></div>
+    <div id="touchpositiony"></div>
+    <div id="touch"></div>
+    <canvas id="canvas" width="500" height="500" style="border:solid black 1px;">
+
+    </canvas>
+
 
 <script>
     var options = {
@@ -57,22 +71,55 @@
 
       if (window.DeviceOrientationEvent) {
         window.addEventListener('deviceorientation', function(event) {
-          console.log("Alpha: " + event.alpha);
-          console.log("Beta: " + event.beta);
-          console.log("Gamma: " + event.gamma);
+          document.getElementById('alpha').innerHTML = `alpha : ${event.alpha}`;
+          document.getElementById('beta').innerHTML = `beta : ${event.beta}`;
+          document.getElementById('gamma').innerHTML = `gamma : ${event.gamma}`;
         });
       } else {
-        console.log("Device orientation is not supported.");
+        console.log("Device orientation n'est pas supporté.");
+      }
 
-        document.getElementById('Alpha').innerHTML = `Alpha : ${event.alpha}`;
-        document.getElementById('Beta').innerHTML = `Beta : ${event.beta}`;
-        document.getElementById('Gamma').innerHTML = `Gamma : ${event.gamma}`;
+      if (window.DeviceMotionEvent) {
+        window.addEventListener('devicemotion', function(event) {
 
-      };
+          document.getElementById('AccelerationY').innerHTML = `AccelerationY : ${event.acceleration.x}`;
+          document.getElementById('AccelerationY').innerHTML = `AccelerationY : ${event.acceleration.y}`;
+          document.getElementById('AccelerationZ').innerHTML = `AccelerationZ : ${event.acceleration.z}`;
+          document.getElementById('RotationAlpha').innerHTML = `RotationAlpha : ${event.rotationRate.alpha}`;
+          document.getElementById('RotationBeta').innerHTML = `RotationBeta : ${event.rotationRate.beta}`;
+          document.getElementById('RotationGamma').innerHTML = `RotationGamma : ${event.rotationRate.gamma}`;
 
-      
+        });
+      } else {
+        console.log("Device motion n'est pas supporté.");
+      }
       
       navigator.geolocation.watchPosition(success, error, options);
+
+      function startup() {
+        const el = document.getElementById('canvas');
+        el.addEventListener('touchstart', handleStart);
+        el.addEventListener('touchend', handleEnd);
+        el.addEventListener('touchcancel', handleCancel);
+        el.addEventListener('touchmove', handleMove);
+    }
+    function handleStart(event){
+        document.getElementById('touchpositionx').innerHTML = `x : ${event.touches[0].clientX}`;
+        document.getElementById('touchpositiony').innerHTML = `y : ${event.touches[0].clientY}`;
+        document.getElementById('touch').innerHTML = 'touchstart';
+    }
+    function handleEnd(event){
+        document.getElementById('touch').innerHTML = 'touchend';
+    }
+    function handleCancel(event){
+        document.getElementById('touch').innerHTML = 'touchcancel';
+    }
+    function handleMove(event){
+        document.getElementById('touch').innerHTML = 'touchmove';
+    }
+    document.addEventListener('DOMContentLoaded', startup);
+   
+    
 </script>    
 </body>
 </html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+    integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
+    crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+    integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
+    crossorigin=""></script>
+    <title>TD2</title>
+</head>
+<body>
+
+  
+  <div id="map" style="height : 1000px;">
+
+  </div>
+
+<script>
+    var options = {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0
+      };
+      
+      function success(pos) {
+        var crd = pos.coords;
+      
+        console.log('Votre position actuelle est :');
+        console.log(`Latitude : ${crd.latitude}`);
+        console.log(`Longitude : ${crd.longitude}`);
+  
+        
+
+var map = L.map('map').setView([crd.latitude, crd.longitude], 13);
+
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
+var marker = L.marker([crd.latitude, crd.longitude]).addTo(map)
+var markerNice = L.marker([43.6961,7.27178 ]).addTo(map)
+      }
+
+      function error(err) {
+        console.warn(`ERREUR (${err.code}): ${err.message}`);
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+            navigator.geolocation.getCurrentPosition(success, error, options);
+        });
+
+       
+</script>    
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+    integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
+    crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+    integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
+    crossorigin=""></script>
+
+    <script type="text/javascript" src="https://stamen-maps.a.ssl.fastly.net/js/tile.stamen.js?v1.3.0"></script>
+    <title>TD2</title>
+</head>
+<body>
+
+      
+  <div id="map" style="height : 1000px;">
+
+</div>
+<script>
+
+var options = {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0
+      };
+      
+function success(pos) {
+    var crd = pos.coords;
+
+
+    var layer = new L.StamenTileLayer("watercolor");
+var map = new L.Map("map", {
+    center: new L.LatLng(crd.latitude, crd.longitude),
+    zoom: 12
+});
+map.addLayer(layer);
+
+var circle = L.circle([crd.latitude, crd.longitude], {
+    color: 'red',
+    fillColor: '#f03',
+    fillOpacity: 0.5,
+    radius: crd.accuracy
+}).addTo(map);
+      
+    var polygon = L.polygon([
+    [27.601846, -80.397396],
+    [18.450755, -66.747262],
+    [32.270589, -64.800310]
+]).addTo(map);
+
+var markerNice = L.marker([43.6961,7.27178 ]).addTo(map)
+var markerMarseille = L.marker([43.299999,5.4  ]).addTo(map)
+
+var latlngs = [
+    [43.6961,7.27178 ],
+    [43.299999,5.4]
+];
+
+var polyline = L.polyline(latlngs, {color: 'red'}).addTo(map);
+var distance = Math.round(getDistanceFromLatLonInKm(latlngs[0][0],latlngs[0][1],latlngs[1][0], latlngs[1][1]));
+            polyline.bindPopup("Distance : " + distance + " km").openPopup();
+
+function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+            var R = 6371; 
+            var dLat = deg2rad(lat2-lat1);  
+            var dLon = deg2rad(lon2-lon1); 
+            var a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2)
+                ; 
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+            var d = R * c; 
+            return d;
+        }
+
+
+
+        function deg2rad(deg) {
+            return deg * (Math.PI/180)
+        }
+
+
+
+}
+
+    function error(err) {
+        console.warn(`ERREUR (${err.code}): ${err.message}`);
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+            navigator.geolocation.getCurrentPosition(success, error, options);
+        });
+</script>
+
+</body>
+</html>

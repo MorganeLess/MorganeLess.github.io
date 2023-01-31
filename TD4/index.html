@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+		</style>
+	</head>
+	<body>
+
+	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+	<script type="importmap">
+  	{
+    	"imports": {
+     	 	"three": "https://unpkg.com/three@0.148.0/build/three.module.js",
+      	"three/addons/": "https://unpkg.com/three@0.148.0/examples/jsm/"
+    	}
+  	}
+	</script>
+
+		<script type="module">
+			import * as THREE from 'three';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+			const scene = new THREE.Scene();
+			const camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 0.1, 1000 );
+			camera.position.set(0,0,2);
+
+			fetch("https://restcountries.com/v3.1/all")
+			.then(function (res) {
+				if (res.ok) {
+					return res.json();
+				}
+			})
+			.then(function (value) {
+				//value[0].flags.png
+				//value[0].latlng[0]
+				//value[0].latlng[1]
+				for(var pays in value){
+					var markerPosition = convertLatLonToCartesian(value[pays].latlng[0], value[pays].latlng[1],1);
+					const texture = new THREE.TextureLoader().load( value[pays].flags.png );
+					var markerGeometry = new THREE.SphereGeometry(0.01, 32, 32);
+					var markerMaterial = new THREE.MeshBasicMaterial({ map: texture});
+					var marker = new THREE.Mesh(markerGeometry, markerMaterial);
+
+					marker.position.set(markerPosition.x, markerPosition.y, markerPosition.z);
+
+					// Ajout du marqueur à la scène
+					scene.add(marker);
+				}
+
+			});
+
+			const renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+
+			const controls = new OrbitControls( camera, renderer.domElement );
+
+			const geometryE = new THREE.SphereGeometry(1, 32, 32);
+			const textureE = new THREE.TextureLoader().load( './textures/2k_earth_daymap.jpg' );
+
+			textureE.wrapS = THREE.RepeatWrapping;
+			textureE.wrapT = THREE.RepeatWrapping;
+			textureE.offset.set(0.50, 0);
+
+			const materialTexE = new THREE.MeshBasicMaterial( { map: textureE } );
+			const earth = new THREE.Mesh( geometryE, materialTexE );
+			earth.position.set(0,0,0);
+			scene.add( earth ) ;
+
+			// White directional light at half intensity shining from the top.
+			const directionalLight = new THREE.DirectionalLight( 0xffffff, 1.5 );
+			scene.add( directionalLight );
+
+			function convertLatLonToCartesian(lat, lon, radius) {
+				var phi = (90 - lat) * Math.PI / 180;
+				var theta = (180 - lon) * Math.PI / 180;
+				
+				var x = radius * Math.sin(phi) * Math.cos(theta);
+				var y = radius * Math.cos(phi);
+				var z = radius * Math.sin(phi) * Math.sin(theta);
+				
+				return new THREE.Vector3(x, y, z);
+			  }
+
+			  
+			  // Ajout du marker sur la sphere
+			  navigator.geolocation.getCurrentPosition(function (position) {
+				var lat = position.coords.latitude;
+				var lon = position.coords.longitude;
+	
+				// Convertir Lat/Lon en coordonnées cartésiennes
+				var markerPosition = convertLatLonToCartesian(lat, lon, 1);
+	
+				// Création d'un marqueur rouge
+				var markerGeometry = new THREE.SphereGeometry(0.02, 32, 32);
+				var markerMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+				var marker = new THREE.Mesh(markerGeometry, markerMaterial);
+	
+				marker.position.set(markerPosition.x, markerPosition.y, markerPosition.z);
+
+				const gltfloader = new GLTFLoader();
+
+				gltfloader.load('Soldier.glb', function ( gltf ) {
+					const content = gltf.scene;
+					gltf.scene.position.set(markerPosition.x, markerPosition.y, markerPosition.z);
+					gltf.scene.scale.set(0.1, 0.1, 0.1);
+					scene.add( gltf.scene );
+	
+				}, undefined, function ( error ) {
+	
+					console.error( error );
+	
+				} );
+	
+				// Ajout du marqueur à la scène
+				scene.add(marker);
+			})
+
+			const animate = function () {
+				requestAnimationFrame( animate );
+
+				renderer.render( scene, camera );
+			};
+
+			animate();
+
+
+ if(window.DeviceOrientationEvent) {
+    window.addEventListener('deviceorientation', function(orientation) {
+      if(duck !== undefined) duck.rotation.set(0, -orientation.alpha * (Math.PI / 180), 0) ; ;
+    }) ;
+  }
+
+		</script>
+	</body>
+</html>
